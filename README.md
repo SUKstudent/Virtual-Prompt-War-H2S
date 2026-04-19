@@ -106,7 +106,7 @@ IntelliCrowd AI demonstrates how AI-driven insights and real-time data can trans
 
 ## 📝 Note
 
-This is a lightweight prototype built for demonstration purposes, focusing on concept, design, and user experience.
+This is a lightweight prototype designed to demonstrate AI-inspired crowd management using simulated real-time data, showcasing how intelligent insights can improve crowd flow, reduce waiting times, and enhance the overall event experience.
 
 -----
 
