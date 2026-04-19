@@ -20,6 +20,8 @@ const ZONES = [
 const SCREENS_LIST = ['dashboard', 'about'];
 let currentScreenIndex = 0;
 let lastEventLog = "📢 System initialized • All sensors online";
+let updateInterval = null;
+let eventLogInterval = null;
 
 // Event log messages
 const EVENT_MESSAGES = [
@@ -46,12 +48,13 @@ function getStarted() {
     setTimeout(() => {
         welcomeScreen.style.display = 'none';
         mainApp.style.display = 'block';
-        mainApp.style.animation = 'fadeIn 0.5s ease';
         
         initializeZones();
         rebuildZonesGrid();
         updateDashboardStats();
         updateTimestamp();
+        
+        // Start intervals
         startStaggeredUpdates();
         startEventLogUpdates();
         
@@ -60,6 +63,9 @@ function getStarted() {
         if (locationSelect) {
             locationSelect.addEventListener('change', updateNavigationSuggestion);
         }
+        
+        // Update timestamp every second
+        setInterval(updateTimestamp, 1000);
     }, 300);
 }
 
@@ -80,6 +86,9 @@ function initializeZones() {
     ZONES.forEach(zone => {
         zone.currentDensity = Math.floor(Math.random() * (60 - 30 + 1)) + 30;
         zone.currentWaitTime = calculateWaitTime(zone.currentDensity, zone.type);
+        zone.targetDensity = zone.currentDensity;
+        zone.targetWaitTime = zone.currentWaitTime;
+        zone.animating = false;
     });
 }
 
@@ -158,10 +167,14 @@ function animateZone(zoneId) {
 }
 
 // ============================================
-// STAGGERED UPDATES (Every 2.5 seconds, with delay between zones)
+// STAGGERED UPDATES (Every 2.5 seconds)
 // ============================================
 function startStaggeredUpdates() {
-    setInterval(() => {
+    // Clear existing interval if any
+    if (updateInterval) clearInterval(updateInterval);
+    
+    updateInterval = setInterval(() => {
+        // Generate new targets for all zones
         const newTargets = ZONES.map(zone => ({
             zoneId: zone.id,
             targetDensity: generateTargetDensity(zone),
@@ -175,14 +188,11 @@ function startStaggeredUpdates() {
             }, index * 150);
         });
         
-        // Update summary stats after all zones
+        // Update summary stats after all zones have started updating
         setTimeout(() => {
             updateDashboardStats();
             updateNavigationSuggestion();
-        }, ZONES.length * 150 + 200);
-        
-        // Update timestamp
-        updateTimestamp();
+        }, ZONES.length * 150 + 500);
         
     }, 2500);
 }
@@ -191,7 +201,10 @@ function startStaggeredUpdates() {
 // EVENT LOG UPDATES
 // ============================================
 function startEventLogUpdates() {
-    setInterval(() => {
+    // Clear existing interval if any
+    if (eventLogInterval) clearInterval(eventLogInterval);
+    
+    eventLogInterval = setInterval(() => {
         const randomMessage = EVENT_MESSAGES[Math.floor(Math.random() * EVENT_MESSAGES.length)];
         if (randomMessage !== lastEventLog) {
             lastEventLog = randomMessage;
@@ -241,7 +254,7 @@ function updateNavigationSuggestion() {
             suggestionDiv.innerHTML = `
                 🚶 <strong>${selectedLocation} is heavily congested</strong><br>
                 Density: ${density}% • Wait: ${waitTime} min<br><br>
-                ⚠️ All zones are moderately crowded. Consider waiting 10-15 minutes.
+                ⚠️ All zones are crowded. Consider waiting 10-15 minutes.
             `;
         }
     } else if (density > 45) {
@@ -249,8 +262,7 @@ function updateNavigationSuggestion() {
         suggestionDiv.innerHTML = `
             ⚠️ <strong>${selectedLocation} is moderately busy</strong><br>
             Current density: ${density}% • Wait time: ${waitTime} min<br><br>
-            📊 AI predicts ${predicted}% density in 10 minutes.<br>
-            💡 Consider visiting during off-peak hours.
+            📊 AI predicts ${predicted}% density in 10 minutes.
         `;
     } else {
         suggestionDiv.innerHTML = `
@@ -365,16 +377,15 @@ function prevScreen() {
 }
 
 function goToScreen(screenName) {
+    // Update current screen index
+    currentScreenIndex = SCREENS_LIST.indexOf(screenName);
+    
     // Hide all screens
-    const screens = ['dashboard', 'about'];
-    screens.forEach(screen => {
-        const element = document.getElementById(`screen-${screen}`);
-        if (element) element.classList.remove('active');
-    });
+    document.getElementById('screen-dashboard').classList.remove('active');
+    document.getElementById('screen-about').classList.remove('active');
     
     // Show selected screen
-    const selectedScreen = document.getElementById(`screen-${screenName}`);
-    if (selectedScreen) selectedScreen.classList.add('active');
+    document.getElementById(`screen-${screenName}`).classList.add('active');
     
     // Update sidebar active state
     document.querySelectorAll('.nav-item').forEach(item => {
