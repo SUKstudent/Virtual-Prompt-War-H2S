@@ -16,8 +16,9 @@ const ZONES = [
     { id: 12, name: "Security Check", type: "safety", currentDensity: 45, currentWaitTime: 5 }
 ];
 
-// Screen order
-let currentScreen = "dashboard";
+// Screen list for navigation
+const SCREENS_LIST = ['dashboard', 'about'];
+let currentScreenIndex = 0;
 let lastEventLog = "📢 System initialized • All sensors online";
 
 // Event log messages
@@ -171,19 +172,19 @@ function startStaggeredUpdates() {
         newTargets.forEach((target, index) => {
             setTimeout(() => {
                 smoothTransition(target.zoneId, target.targetDensity, target.targetWaitTime);
-            }, index * 150); // 150ms delay between zones
+            }, index * 150);
         });
         
         // Update summary stats after all zones
         setTimeout(() => {
             updateDashboardStats();
-            updateNavigationSuggestion(); // Update navigation suggestion when data changes
+            updateNavigationSuggestion();
         }, ZONES.length * 150 + 200);
         
         // Update timestamp
         updateTimestamp();
         
-    }, 2500); // Update every 2.5 seconds
+    }, 2500);
 }
 
 // ============================================
@@ -218,16 +219,13 @@ function updateNavigationSuggestion() {
         return;
     }
     
-    // Find the selected zone
     const zone = ZONES.find(z => z.name === selectedLocation);
     if (!zone) return;
     
     const density = zone.currentDensity;
     const waitTime = zone.currentWaitTime;
     
-    // Generate suggestion based on density
     if (density > 70) {
-        // Find less crowded alternatives
         const alternatives = ZONES.filter(z => z.currentDensity < 50 && z.name !== selectedLocation).slice(0, 2);
         
         if (alternatives.length > 0) {
@@ -283,7 +281,6 @@ function updateSingleZoneUI(zoneId) {
         }
         if (fillBar) fillBar.style.width = `${zone.currentDensity}%`;
         
-        // Update color class
         const colorClass = getColorClass(zone.currentDensity);
         zoneCard.classList.remove('green', 'yellow', 'red');
         zoneCard.classList.add(colorClass);
@@ -351,11 +348,23 @@ function updateTimestamp() {
 }
 
 // ============================================
-// SCREEN NAVIGATION
+// SCREEN NAVIGATION (Back/Next)
 // ============================================
+function nextScreen() {
+    if (currentScreenIndex < SCREENS_LIST.length - 1) {
+        currentScreenIndex++;
+        goToScreen(SCREENS_LIST[currentScreenIndex]);
+    }
+}
+
+function prevScreen() {
+    if (currentScreenIndex > 0) {
+        currentScreenIndex--;
+        goToScreen(SCREENS_LIST[currentScreenIndex]);
+    }
+}
+
 function goToScreen(screenName) {
-    currentScreen = screenName;
-    
     // Hide all screens
     const screens = ['dashboard', 'about'];
     screens.forEach(screen => {
@@ -376,6 +385,25 @@ function goToScreen(screenName) {
             item.classList.remove('active');
         }
     });
+    
+    // Update page indicator
+    const pageIndicator = document.getElementById('pageIndicator');
+    if (pageIndicator) {
+        const names = { dashboard: 'Dashboard', about: 'About' };
+        pageIndicator.textContent = names[screenName] || screenName;
+    }
+    
+    // Update back button visibility
+    const backBtn = document.getElementById('backBtn');
+    if (backBtn) {
+        if (currentScreenIndex === 0) {
+            backBtn.style.visibility = 'hidden';
+            backBtn.style.opacity = '0';
+        } else {
+            backBtn.style.visibility = 'visible';
+            backBtn.style.opacity = '1';
+        }
+    }
     
     // Refresh dashboard data if needed
     if (screenName === 'dashboard') {
