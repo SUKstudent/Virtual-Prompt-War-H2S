@@ -220,4 +220,205 @@ function updateNavigationPageSuggestion() {
         } else if (selectedLocation === "Parking Area") {
             suggestionText = `Parking is ${density}% full. Overflow parking available at the North lot - 5 min walk.`;
         } else if (selectedLocation === "Stage") {
-            suggestionText = `Stage area
+            suggestionText = `Stage area at ${density}% capacity. Next performance starts in 20 minutes - arrive 5 minutes early for better spot.`;
+        } else {
+            suggestionText = `${selectedLocation} is at ${density}% capacity (${waitTime} min wait). Head to ${lessCrowded[0]?.name || 'Gate C'} which is only ${lessCrowded[0]?.currentDensity || 35}% full.`;
+        }
+        
+        suggestionDiv.innerHTML = `
+            <div style="color: #ef4444; font-size: 1.1rem; margin-bottom: 0.5rem;">🚨 AVOID - ${density}% FULL</div>
+            <strong>⏱ Wait time:</strong> ${waitTime} minutes<br><br>
+            🤖 <strong>AI says:</strong> ${suggestionText}
+        `;
+    } 
+    else if (density > 55) {
+        let suggestionText = '';
+        if (selectedLocation === "Food Court") {
+            suggestionText = `Food Court wait is ${waitTime} minutes. The burger stall has the shortest line right now.`;
+        } else if (selectedLocation.includes('Gate')) {
+            suggestionText = `${selectedLocation} has ${waitTime} min wait. Gate C is moving faster (${ZONES.find(z => z.name === 'Gate C')?.currentDensity || 45}% full).`;
+        } else if (selectedLocation === "Restrooms") {
+            suggestionText = `Restrooms at ${density}% capacity. Expect ${waitTime} min wait. Use restrooms near Food Court for shorter lines.`;
+        } else {
+            suggestionText = `${selectedLocation} is at ${density}% capacity. Wait time ${waitTime} min. Come back in 20 minutes when crowd clears.`;
+        }
+        
+        suggestionDiv.innerHTML = `
+            <div style="color: #f97316; font-size: 1.1rem; margin-bottom: 0.5rem;">⚠️ ${density}% FULL - MODERATE CROWD</div>
+            <strong>⏱ Wait time:</strong> ${waitTime} minutes<br><br>
+            🤖 <strong>AI says:</strong> ${suggestionText}
+        `;
+    } 
+    else {
+        let suggestionText = '';
+        if (selectedLocation === "Food Court") {
+            suggestionText = `Food Court is only ${density}% full with ${waitTime} min wait. Great time to grab lunch - try the new pizza stall.`;
+        } else if (selectedLocation.includes('Gate')) {
+            suggestionText = `${selectedLocation} is moving fast (${waitTime} min wait). Perfect time to enter.`;
+        } else if (selectedLocation === "Stage") {
+            suggestionText = `Stage area is ${density}% full. Next show starts in 15 minutes - you can get front row easily.`;
+        } else if (selectedLocation === "Merchandise Zone") {
+            suggestionText = `No queue at Merchandise right now (${waitTime} min wait). Limited edition items still available.`;
+        } else {
+            suggestionText = `${selectedLocation} is at ${density}% capacity with ${waitTime} min wait. Currently one of the least crowded areas in the venue.`;
+        }
+        
+        suggestionDiv.innerHTML = `
+            <div style="color: #22c55e; font-size: 1.1rem; margin-bottom: 0.5rem;">✅ ${density}% FULL - LOW CROWD</div>
+            <strong>⏱ Wait time:</strong> ${waitTime} minutes<br><br>
+            🤖 <strong>AI says:</strong> ${suggestionText}
+        `;
+    }
+}
+
+// UI UPDATE FUNCTIONS
+function updateSingleZoneUI(zoneId) {
+    const zone = ZONES.find(z => z.id === zoneId);
+    if (!zone) return;
+    
+    const zoneCard = document.querySelector(`.zone-card[data-zone-id="${zoneId}"]`);
+    if (zoneCard) {
+        const densityValue = zoneCard.querySelector('.density-value');
+        const predictionBadge = zoneCard.querySelector('.prediction-badge');
+        const fillBar = zoneCard.querySelector('.density-fill');
+        
+        if (densityValue) densityValue.textContent = `${zone.currentDensity}%`;
+        if (predictionBadge) {
+            const predicted = Math.min(98, zone.currentDensity + Math.floor(Math.random() * 10) - 3);
+            predictionBadge.innerHTML = `📈 ${predicted}% in 10min`;
+        }
+        if (fillBar) fillBar.style.width = `${zone.currentDensity}%`;
+        
+        const colorClass = getColorClass(zone.currentDensity);
+        zoneCard.classList.remove('green', 'yellow', 'red');
+        zoneCard.classList.add(colorClass);
+        if (fillBar) fillBar.classList.remove('green', 'yellow', 'red');
+        if (fillBar) fillBar.classList.add(colorClass);
+    }
+}
+
+function rebuildZonesGrid() {
+    const zonesGrid = document.getElementById('zonesGrid');
+    if (!zonesGrid) return;
+    
+    zonesGrid.innerHTML = '';
+    ZONES.forEach(zone => {
+        const colorClass = getColorClass(zone.currentDensity);
+        const predicted = Math.min(98, zone.currentDensity + Math.floor(Math.random() * 10) - 3);
+        
+        const zoneCard = document.createElement('div');
+        zoneCard.className = `zone-card ${colorClass}`;
+        zoneCard.setAttribute('data-zone-id', zone.id);
+        zoneCard.innerHTML = `
+            <div class="zone-info">
+                <h4>${zone.name}</h4>
+                <div class="density-bar">
+                    <div class="density-fill ${colorClass}" style="width: ${zone.currentDensity}%"></div>
+                </div>
+            </div>
+            <div class="zone-stats">
+                <div class="density-value">${zone.currentDensity}%</div>
+                <div class="prediction-badge">📈 ${predicted}% in 10min</div>
+            </div>
+        `;
+        zonesGrid.appendChild(zoneCard);
+    });
+}
+
+function updateDashboardStats() {
+    const avgDensity = Math.round(ZONES.reduce((s, z) => s + z.currentDensity, 0) / ZONES.length);
+    const crowdedCount = ZONES.filter(z => z.currentDensity > 70).length;
+    
+    const avgDensityEl = document.getElementById('avgDensity');
+    const crowdedCountEl = document.getElementById('crowdedCount');
+    const eventStatusEl = document.getElementById('eventStatus');
+    
+    if (avgDensityEl) avgDensityEl.innerHTML = avgDensity + '<span class="unit">%</span>';
+    if (crowdedCountEl) crowdedCountEl.innerHTML = crowdedCount;
+    if (eventStatusEl) {
+        if (avgDensity > 65) eventStatusEl.innerHTML = '🔴 High Traffic';
+        else if (avgDensity > 40) eventStatusEl.innerHTML = '🟡 Moderate';
+        else eventStatusEl.innerHTML = '🟢 Normal';
+    }
+}
+
+function updateTimestamp() {
+    const timestampEl = document.getElementById('lastUpdate');
+    if (timestampEl) {
+        const now = new Date();
+        const timeString = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        timestampEl.innerHTML = `⏱ Last updated: ${timeString}`;
+    }
+}
+
+// SCREEN NAVIGATION
+function nextScreen() {
+    if (currentScreenIndex < SCREENS_LIST.length - 1) {
+        currentScreenIndex++;
+        goToScreen(SCREENS_LIST[currentScreenIndex]);
+    }
+}
+
+function prevScreen() {
+    if (currentScreenIndex > 0) {
+        currentScreenIndex--;
+        goToScreen(SCREENS_LIST[currentScreenIndex]);
+    }
+}
+
+function goToScreen(screenName) {
+    currentScreenIndex = SCREENS_LIST.indexOf(screenName);
+    
+    document.getElementById('screen-dashboard').classList.remove('active');
+    document.getElementById('screen-navigation').classList.remove('active');
+    document.getElementById('screen-about').classList.remove('active');
+    document.getElementById(`screen-${screenName}`).classList.add('active');
+    
+    document.querySelectorAll('.nav-item').forEach(item => {
+        const itemScreen = item.getAttribute('data-screen');
+        if (itemScreen === screenName) {
+            item.classList.add('active');
+        } else {
+            item.classList.remove('active');
+        }
+    });
+    
+    const pageIndicator = document.getElementById('pageIndicator');
+    if (pageIndicator) {
+        const names = { dashboard: 'Dashboard', navigation: 'Navigation', about: 'About' };
+        pageIndicator.textContent = names[screenName] || screenName;
+    }
+    
+    const backBtn = document.getElementById('backBtn');
+    if (backBtn) {
+        if (currentScreenIndex === 0) {
+            backBtn.style.visibility = 'hidden';
+            backBtn.style.opacity = '0';
+        } else {
+            backBtn.style.visibility = 'visible';
+            backBtn.style.opacity = '1';
+        }
+    }
+    
+    const nextBtn = document.getElementById('nextBtn');
+    if (nextBtn) {
+        if (currentScreenIndex === SCREENS_LIST.length - 1) {
+            nextBtn.style.visibility = 'hidden';
+            nextBtn.style.opacity = '0';
+        } else {
+            nextBtn.style.visibility = 'visible';
+            nextBtn.style.opacity = '1';
+        }
+    }
+    
+    if (screenName === 'dashboard') {
+        rebuildZonesGrid();
+        updateDashboardStats();
+    }
+    if (screenName === 'navigation') {
+        updateNavigationPageSuggestion();
+    }
+}
+
+// INITIALIZE
+initializeZones();
