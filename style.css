@@ -263,7 +263,7 @@ header {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 1rem;
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
 }
 
 .stat-card {
@@ -289,6 +289,48 @@ header {
     font-size: 0.8rem;
     font-weight: 400;
     color: #64748b;
+}
+
+/* 🧭 Smart Navigation */
+.nav-selector {
+    background: rgba(168, 85, 247, 0.1);
+    border-radius: 0.75rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.nav-selector label {
+    font-weight: 600;
+    color: #a855f7;
+}
+
+.location-select {
+    flex: 1;
+    padding: 0.6rem;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 0.5rem;
+    color: white;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.location-select option {
+    background: #1a1a4e;
+}
+
+.nav-suggestion {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 0.75rem;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    border-left: 3px solid #a855f7;
 }
 
 /* 🟡 Center Section - Zone Monitoring Grid */
@@ -465,5 +507,10 @@ footer {
     
     .welcome-card {
         padding: 1.5rem;
+    }
+    
+    .nav-selector {
+        flex-direction: column;
+        align-items: stretch;
     }
 }
