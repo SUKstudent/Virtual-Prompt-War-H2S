@@ -17,7 +17,7 @@
             </div>
             <div class="live-status">
                 <span class="pulse-dot"></span>
-                <span id="lastUpdate">Live</span>
+                <span id="lastUpdate">Last updated: --:--:--</span>
             </div>
         </header>
 
@@ -85,6 +85,12 @@
                         <h2>📍 Live Dashboard</h2>
                         <button class="refresh-btn" onclick="forceRefresh()">🔄 Refresh</button>
                     </div>
+                    
+                    <!-- Event Log - Cause Effect Line -->
+                    <div class="event-log" id="eventLog">
+                        📢 System initialized • All sensors online
+                    </div>
+                    
                     <div class="stats-row">
                         <div class="stat-card">
                             <span class="stat-label">Total Zones</span>
@@ -175,7 +181,7 @@
 
         <!-- Footer -->
         <footer>
-            <p>🔒 Privacy-first • 🤖 AI Decision Engine • 📡 Real-time updates every 3 seconds</p>
+            <p>🔒 Privacy-first • 🤖 AI Decision Engine • 📡 Real-time updates every 8 seconds</p>
         </footer>
     </div>
 
