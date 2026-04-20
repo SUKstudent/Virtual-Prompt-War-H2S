@@ -7,13 +7,13 @@
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
-<body>
-    <!-- WELCOME SCREEN (Entry Layer) -->
+<body aria-live="polite">
+    <!-- WELCOME SCREEN -->
     <div id="welcomeScreen" class="welcome-screen">
         <div class="welcome-container">
             <div class="welcome-card">
                 <div class="welcome-icon" aria-hidden="true">🎤</div>
-                <h1 class="welcome-title">IntelliCrowd <span class="ai-badge" aria-label="AI powered">AI</span></h1>
+                <h1 class="welcome-title">IntelliCrowd <span class="ai-badge">AI</span></h1>
                 <p class="welcome-tagline">Enhancing Event Safety Through Real-Time Crowd Intelligence.</p>
                 <p class="welcome-description">AI-powered crowd management system for large-scale venues. Monitor density, predict wait times, and optimize crowd flow in real-time.</p>
                 <div class="welcome-features">
@@ -22,18 +22,17 @@
                     <div class="welcome-feature">🚨 AI-powered alerts for overcrowding</div>
                     <div class="welcome-feature">🤖 Smart navigation & route suggestions</div>
                 </div>
-                <button class="get-started-btn" onclick="getStarted()" aria-label="Enter the application">Get Started →</button>
+                <button class="get-started-btn" onclick="getStarted()" aria-label="Enter application">Get Started →</button>
             </div>
         </div>
     </div>
 
-    <!-- MAIN APP (Hidden until Get Started) -->
+    <!-- MAIN APP -->
     <div id="mainApp" class="app" style="display: none;">
-        <!-- Header with Timestamp -->
         <header>
             <div class="logo">
                 <span class="logo-icon" aria-hidden="true">🎤</span>
-                <h1>IntelliCrowd <span class="ai-badge" aria-label="AI powered">AI</span></h1>
+                <h1>IntelliCrowd <span class="ai-badge">AI</span></h1>
             </div>
             <div class="live-status">
                 <span class="pulse-dot" aria-hidden="true"></span>
@@ -41,29 +40,26 @@
             </div>
         </header>
 
-        <!-- Main Layout: Sidebar + Content -->
         <div class="main-layout">
-            <!-- SIDEBAR NAVIGATION -->
             <aside class="sidebar" aria-label="Main navigation">
                 <nav class="sidebar-nav">
-                    <button class="nav-item active" data-screen="dashboard" onclick="goToScreen('dashboard')" aria-label="Dashboard view">
+                    <button class="nav-item active" data-screen="dashboard" onclick="goToScreen('dashboard')" aria-label="Dashboard">
                         <span class="nav-icon" aria-hidden="true">📊</span>
                         <span>Dashboard</span>
                     </button>
-                    <button class="nav-item" data-screen="navigation" onclick="goToScreen('navigation')" aria-label="Navigation view">
+                    <button class="nav-item" data-screen="navigation" onclick="goToScreen('navigation')" aria-label="Navigation">
                         <span class="nav-icon" aria-hidden="true">🧭</span>
                         <span>Navigation</span>
                     </button>
-                    <button class="nav-item" data-screen="about" onclick="goToScreen('about')" aria-label="About view">
+                    <button class="nav-item" data-screen="about" onclick="goToScreen('about')" aria-label="About">
                         <span class="nav-icon" aria-hidden="true">ℹ️</span>
                         <span>About</span>
                     </button>
                 </nav>
             </aside>
 
-            <!-- RIGHT CONTENT AREA -->
             <main class="content">
-                <!-- SCREEN 1: DASHBOARD -->
+                <!-- DASHBOARD -->
                 <div id="screen-dashboard" class="screen active">
                     <div class="stats-row">
                         <div class="stat-card">
@@ -87,7 +83,7 @@
                     <div class="section-title">
                         <h2>📍 Live Zone Monitoring</h2>
                     </div>
-                    <div class="zones-grid" id="zonesGrid" aria-live="polite" aria-label="Live crowd density monitoring for 12 venue zones" role="region"></div>
+                    <div class="zones-grid" id="zonesGrid" role="region" aria-label="Live crowd density monitoring for 12 venue zones" aria-live="polite"></div>
 
                     <div class="info-footer">
                         <div class="event-log" id="eventLog" aria-live="polite">
@@ -96,7 +92,7 @@
                     </div>
                 </div>
 
-                <!-- SCREEN 2: NAVIGATION (Smart Navigation Assistant) -->
+                <!-- NAVIGATION -->
                 <div id="screen-navigation" class="screen">
                     <div class="nav-page-container">
                         <div class="nav-page-header">
@@ -141,35 +137,28 @@
                     </div>
                 </div>
 
-                <!-- SCREEN 3: ABOUT -->
+                <!-- ABOUT -->
                 <div id="screen-about" class="screen">
                     <div class="about-container">
                         <h2>About IntelliCrowd AI</h2>
                         <p class="about-tagline">Enhancing Event Safety Through Real-Time Crowd Intelligence.</p>
                         <div class="about-content">
                             <h3>🎯 Mission</h3>
-                            <p>To revolutionize crowd management at large-scale events using AI-powered real-time insights, ensuring safety, efficiency, and an enjoyable experience for all attendees.</p>
-                            
+                            <p>To revolutionize crowd management at large-scale events using AI-powered real-time insights.</p>
                             <h3>🔧 How It Works</h3>
-                            <p>Our system simulates real-time sensor data across 12 venue zones, using AI algorithms to predict crowd density, estimate wait times, and provide intelligent routing suggestions.</p>
-                            
+                            <p>AI algorithms predict crowd density, estimate wait times, and provide intelligent routing suggestions.</p>
                             <h3>📊 Features</h3>
                             <ul>
                                 <li>📍 Real-time crowd monitoring across 12 zones</li>
                                 <li>⏱ Live queue status & wait time predictions</li>
                                 <li>🚨 AI-powered alerts for overcrowding</li>
                                 <li>🤖 Smart navigation & route suggestions</li>
-                                <li>📡 Gradual, realistic data transitions</li>
-                                <li>🔒 Privacy-first anonymous data</li>
                             </ul>
-                            
-                            <h3>🏗️ Built With</h3>
-                            <p>HTML5, CSS3, JavaScript • AI Decision Engine • Real-time Simulation</p>
                         </div>
                     </div>
                 </div>
 
-                <!-- BOTTOM NAVIGATION (Back/Next) -->
+                <!-- BOTTOM NAVIGATION -->
                 <div class="bottom-nav">
                     <button class="bottom-nav-btn back" id="backBtn" onclick="prevScreen()" aria-label="Previous screen">← Back</button>
                     <span class="page-indicator" id="pageIndicator" aria-live="polite">Dashboard</span>
@@ -178,7 +167,6 @@
             </main>
         </div>
 
-        <!-- Footer -->
         <footer>
             <p>🔒 Privacy-first • 🤖 AI Decision Engine • 📡 Real-time updates every 2.5 seconds</p>
         </footer>
